@@ -9,5 +9,7 @@ public class ceshi {
         System.out.println("Hello git");
         System.out.println("fghauihfui");
         System.out.println("lwy");
+        System.out.println("1111");
+        System.out.println("2222");
     }
 }
