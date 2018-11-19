@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>list.html</title>
+	
+    <meta http-equiv="keywords" content="keyword1,keyword2,keyword3">
+    <meta http-equiv="description" content="this is my page">
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+    
+    <!--<link rel="stylesheet" type="text/css" href="./styles.css">-->
+  </head>
+  
+  <body>
+ <div class="main" id="user">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>名称</th>
+                            <th>位置</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                           <td> <input type="text" v-model="deptNo"></td>
+                            <td> <input type="text" v-model="dname"></td>
+                            <td> <input type="text" v-model="loc"></td>
+                            <td> <button @click="addData">添加数据</button></td>
+                        </tr>
+                       
+                        <tr v-for="user in users">
+                            <td>{{user.DEPTNO}}</td>
+                            <td>{{user.DNAME}}</td>
+                            <td>{{user.LOC}}</td>
+                             <td> <button @click="del(user.DEPTNO)">删除</button><button @click="Edit(user.DEPTNO)" data-target="#myModal">更新</button></td>
+                        </tr>
+                        
+                    </tbody>
+                </table>
+            </div>
+        </div>
+</div>
+     <script src="../dist/vue.js"></script>
+ <script src="../dist/vue-resource.js"></script>
+  
+ <script>
+    var vm = new Vue({
+        el: '#user',
+        data:  {
+            users:[{"DEPTNO":10,"DNAME":"aaa","LOC":"1"}
+            ]
+        } ,
+        created: function() {
+            this.getlist();
+        },methods: {
+         addData:function () {
+            //实现将数据post到数据添加接口
+                   alert(this.deptNo+","+this.dname+","+this.loc);
+                //获取用户填写的文本框的值,只需要通过this.pname
+                var postData={deptNo:this.deptNo,deptName:this.dname,loc:this.loc};
+                 this.users.push({"DEPTNO":this.deptNo,"DNAME":this.dname,"LOC":this.loc});
+                var options={emulateJSON:true};
+                //如果Web服务器无法处理编码为application/json的请求，你可以启用emulateJSON选项。 emulateJSON:true
+                this.$http.post('/ssm-easyui/dept/addVue.do',postData,options).then(function (response) {
+                   alert(response.body.status);
+                    if(response.body.status!=0)
+                    {
+                        alert(response.body.message);
+                        return ;
+                    }
+                    //将文本框中的值清空
+                    this.deptNo="";
+                    //直接将列表数据重新加载一次
+                    this.getlist();//局部刷新一下
+                });
+
+            },
+            getlist:function(){
+	            var url="/ssm-easyui/dept/listDeptJsonVue.do";
+	            //ajax获取数据
+	            this.$http.get(url).then(function(result){
+	                var json = result.bodyText;
+	               // alert(json);
+	                 console.log(json);
+	                //需要json2.js
+	                this.users = JSON.parse(json);
+	                //也可以，有些浏览器不支持
+	                //console.log(this.users[0].deptNo);
+	            },function(response){
+	                console.log(response)
+	            })
+            }
+            /* Save: function (event) {
+                if (this.rowtemplate.Id == 0) {
+                    //设置当前新增行的Id
+                    this.rowtemplate.Id = this.rows.length + 1;
+                    this.rows.push(this.rowtemplate);
+                }
+                
+                //还原模板
+                this.rowtemplate = { Id: 0, Name: '', Age: '', School: '', Remark: '' }
+            } */,
+            del: function (id) {
+               alert(id);
+                var options={emulateJSON:true};
+                this.$http.post('/ssm-easyui/dept/delVue.do',{deptId:id},options).then(function (response) {
+                    if(response.body.status!=0)
+                    {
+                        alert(response.body.message);
+                        return ;
+                    }
+                    //将文本框中的值清空
+                    this.deptNo="";
+                    //直接将列表数据重新加载一次
+                    this.getlist();//局部刷新一下
+                });
+                //实际项目中参数操作肯定会涉及到id去后台删除，这里只是展示，先这么处理。
+               /*  for (var i=0;i<this.rows.length;i++){
+                    if (this.rows[i].Id == id) {
+                        this.rows.splice(i, 1);
+                        break;
+                    }
+                } */
+            },
+            Edit: function (id) {
+            //alert(this.users[0].DEPTNO);
+                for (var i=0;i<this.users.length;i++){
+                    if (this.users[i].DEPTNO == id) {
+                       alert(this.users[i].DNAME);
+                        break;
+                    }
+                }
+            }
+        } 
+    });
+</script>
+  </body>
+</html>

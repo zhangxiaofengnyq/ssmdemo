@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jquery.min.js"></script>
+    <script>
+        $(function () {
+            //设置或获取 href 属性中跟在问号后面的部分
+            var test = window.location.search;
+            var newsids=test.split("=");//对获得的参数字符串按照“=”进行分割
+            var newsid=newsids[1];//得到参数值
+            $.ajax({
+                url:"/sb/emp/selectById",
+                type:"POST",
+                data:{'empNo':newsid},
+                success:function (data) {
+                   $("#empNo").val(data[0].empNo);
+                    $("#ename").val(data[0].ename);
+                    $("#comm").val(data[0].comm);
+                }
+            })
+        })
+        function fun(){
+            $.ajax({
+                url:"/sb/emp/update",
+                type:"POST",
+                data:{ "empNo":$("#empNo").val(), "ename":$("#ename").val(),
+                        "comm":$("#comm").val()},
+                success:function(data){
+                    window.location.href="/sb/emp/toList"
+                }
+            })
+        }
+    </script>
+
+
+</head>
+<body>
+    <center>
+    <table>
+        <tr hidden><td>empNo:</td><td><input type="text"  id="empNo"></td></tr>
+        <tr><td>ename:</td><td><input type="text"  id="ename"></td></tr>
+        <tr><td>comm:</td><td><input type="text"  id="comm"></td></tr>
+        <tr><td><input type="button" onclick="fun()" value="提交"></td></tr>
+    </table>
+    </center>
+</body>
+</html>

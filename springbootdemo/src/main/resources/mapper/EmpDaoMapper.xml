@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.aaa.sm.dao.EmpDao">
+    <select id="getList" resultType="emp">
+    select empno,ename,job,sal as salary,comm,to_char(hiredate,'yyyy-mm-dd') as hireDate,
+    (select ename from emp b where a.mgr=b.empno) as mgrName,
+    (select dname from dept where deptno=a.deptno) as deptName
+    from emp a
+    <where>
+        <if test="ename!=null and ename!= '' ">
+            and ename like '%'||#{ename}||'%'
+        </if>
+    </where>
+    order by ${sort} ${order}  <!-- ${}取值，原封不动的取出数据，相当于占位符，缺点：可以进行sql注入
+         #{}取值，防止sql注入
+         -->
+    </select>
+    <insert id="add">
+        insert into emp(empno,ename) values (#{empNo},#{ename})
+    </insert>
+
+    <delete id="delete">
+        delete from emp where empno = #{empNo}
+    </delete>
+
+    <select id="selectById" resultType="emp">
+        select empno,ename,comm from emp where empno = #{empNo}
+    </select>
+
+    <update id="update">
+        update emp set ename=#{ename},comm=#{comm} where empno=#{empNo}
+    </update>
+
+    <select id="select">
+        select * from emp where empno = #{empNo} and ename = #{ename}
+    </select>
+
+    <!-- getProListByDeptNo -->
+    <select id="getProListByDeptNo" parameterType="map" statementType="CALLABLE">
+        call pkg_emp.pro_query_mep_bydeptno(#{deptNo,jdbcType=INTEGER,mode=IN},
+        #{csrEmp,mode=OUT,jdbcType=CURSOR,javaType=java.sql.ResultSet,
+        resultMap=empResult})
+    </select>
+    <!-- 结果映射 -->
+    <resultMap id="empResult" type="emp">
+        <id column="empno" property="empNo"></id>
+        <result column="ename" property="ename"></result>
+        <result column="job" property="job"></result>
+        <result column="sal" property="salary"></result>
+        <result column="hiredate" property="hireDate"></result>
+        <result column="comm" property="comm"></result>
+    </resultMap>
+</mapper>

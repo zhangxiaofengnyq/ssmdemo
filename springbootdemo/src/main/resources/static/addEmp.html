@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="jquery.min.js"></script>
+    <script>
+        function fun(){
+            $.ajax({
+                url:"/sb/emp/add",
+                type:"POST",
+                data:{"empNo":$("#empNo").val(),"ename":$("#ename").val()},
+                success:function(data){
+                   window.location.href="/sb/emp/toList"
+            }
+
+            })
+        }
+    </script>
+</head>
+<body>
+        <center>
+        <table border="10">
+            <tr>
+                <td>员工号</td> <td><input type="text" name="empNo" id="empNo"></td>
+            </tr>
+            <tr>
+               <td>姓名</td>   <td><input type="text" name="ename" id="ename"></td>
+            </tr>
+            <input type = "button"  onclick="fun()" value="提交">
+        </table>
+        </center>
+
+</body>
+</html>
